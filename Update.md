@@ -10,3 +10,8 @@
 - Buy Amount Limit In Usd
 - Entry Trade Sec
 - Trade Sec From Resolve (Exit Time)
+
+# Version 1.1
+
+- Multi Target Address
+- Trade Sec From Resolve (Exit Time)

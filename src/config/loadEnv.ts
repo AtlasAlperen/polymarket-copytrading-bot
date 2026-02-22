@@ -16,6 +16,7 @@ function loadToml(): Partial<AppConfig> {
   const copy = data.copy as Record<string, unknown> | undefined;
   const filter = data.filter as Record<string, unknown> | undefined;
   const exit = data.exit as Record<string, unknown> | undefined;
+  const ui = data.ui as Record<string, unknown> | undefined;
   const rawTargets = copy?.target_address ?? copy?.target_addresses;
   const targets = Array.isArray(rawTargets)
     ? (rawTargets as string[]).filter((s): s is string => typeof s === "string")
@@ -26,6 +27,7 @@ function loadToml(): Partial<AppConfig> {
   return {
     clobHost: (data.clob_host as string) ?? DEFAULT_HOST,
     chainId: (data.chain_id as number) ?? DEFAULT_CHAIN_ID,
+    port: (data.port as number) ?? 3333,
     simulationMode: (data.simulation as boolean) ?? false,
     copy: {
       targetAddress: one,
@@ -43,6 +45,10 @@ function loadToml(): Partial<AppConfig> {
       takeProfit: (exit?.take_profit as number) ?? 0,
       stopLoss: (exit?.stop_loss as number) ?? 0,
       trailingStop: (exit?.trailing_stop as number) ?? 0,
+    },
+    ui: {
+      deltaHighlightSec: (ui?.delta_highlight_sec as number) ?? 10,
+      deltaAnimationSec: (ui?.delta_animation_sec as number) ?? 2,
     },
   };
 }
@@ -67,6 +73,7 @@ export function loadConfig(): AppConfig {
   return {
     clobHost: fromToml.clobHost ?? DEFAULT_HOST,
     chainId: fromToml.chainId ?? DEFAULT_CHAIN_ID,
+    port: parseInt(process.env.PORT ?? String(fromToml.port ?? 3333), 10),
     simulationMode: fromToml.simulationMode ?? false,
     walletPrivateKey,
     proxyWalletAddress,
@@ -88,6 +95,10 @@ export function loadConfig(): AppConfig {
       takeProfit: 0,
       stopLoss: 0,
       trailingStop: 0,
+    },
+    ui: fromToml.ui ?? {
+      deltaHighlightSec: 10,
+      deltaAnimationSec: 2,
     },
   };
 }

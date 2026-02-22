@@ -1,7 +1,8 @@
 import { loadConfig } from "./config";
 import { createClient } from "./config/client";
-import { runActivityStream, logTrade, runPositionPolling } from "./realtime";
+import { runActivityStream, logTrade, runPositionPolling, runPositionsUiPoll } from "./realtime";
 import { copyTrade, shouldCopyTrade, recordEntry, runExitLoop } from "./trading";
+import { startWebServer, setStatus, setUiConfig } from "./web";
 
 async function run() {
   const config = loadConfig();
@@ -26,15 +27,20 @@ async function run() {
     runExitLoop(client, config);
   }
 
+  setStatus(config.simulationMode ? "Sim" : "Live", targets.length, config.walletAddress, targets);
+  if (config.ui) setUiConfig(config.ui);
+  startWebServer(config.port);
+
   if (targets.length === 1) {
     console.log(config.simulationMode ? "Simulation" : "Subscribe", "| 1 target");
     runActivityStream(client, config);
+    runPositionsUiPoll(config);
   } else {
     console.log(config.simulationMode ? "Simulation" : "Polling", `| ${targets.length} targets`);
     runPositionPolling(config, (trade, fromUser) => {
       if (!shouldCopyTrade(config, trade)) return;
       if (config.simulationMode) {
-        logTrade("SIM", trade, `from ${fromUser.slice(0, 10)}… skipped`);
+        logTrade("SIM", trade, { targetAddress: fromUser, copyStatus: "skipped" });
       } else if (client) {
         copyTrade(
           client,
@@ -45,10 +51,10 @@ async function run() {
         )
           .then((filled) => {
             if (filled && trade.side === "BUY") recordEntry(trade.asset_id, filled.size, filled.price);
-            logTrade("LIVE", trade, `from ${fromUser.slice(0, 10)}… ok`);
+            logTrade("LIVE", trade, { targetAddress: fromUser, copyStatus: "ok" });
           })
           .catch((e) => {
-            logTrade("LIVE", trade, `from ${fromUser.slice(0, 10)}… FAILED`);
+            logTrade("LIVE", trade, { targetAddress: fromUser, copyStatus: "FAILED" });
             console.error("  ", e?.message ?? e);
           });
       }

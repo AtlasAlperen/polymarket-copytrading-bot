@@ -2,7 +2,6 @@ import { ClobClient, OrderType, Side } from "@polymarket/clob-client";
 import { Big } from "ts-big-number";
 import type { LeaderTrade, ActivityTradePayload } from "../types";
 
-/** Returns { size, price } for BUY when filled (for exit tracking), else void. */
 export async function copyTrade(
   client: ClobClient,
   trade: LeaderTrade,

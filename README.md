@@ -43,6 +43,8 @@ I have developed an advanced Polymarket trading bot, including a high-performanc
 
 The architecture is designed for speed, efficiency, and scalability, making it suitable for serious traders looking to automate and optimize their activity in prediction markets. If you are interested in purchasing or learning more about the system and its capabilities, feel free to contact me directly.
 
+<img width="1889" height="557" alt="image" src="https://github.com/user-attachments/assets/91a0fede-47b6-4911-8be4-b99c262c4f76" />
+
 TG: [xstacks](https://t.me/x_stacks)
 
 ## Run

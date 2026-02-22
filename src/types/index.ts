@@ -25,9 +25,18 @@ export interface ExitConfig {
   trailingStop: number;
 }
 
+export interface UiConfig {
+  /** Seconds to keep positions with balance changes at top (0 = default 10) */
+  deltaHighlightSec: number;
+  /** Seconds for delta +/- animation (0 = default 2) */
+  deltaAnimationSec: number;
+}
+
 export interface AppConfig {
   clobHost: string;
   chainId: number;
+  /** Web UI port (env PORT overrides) */
+  port: number;
   simulationMode: boolean;
   walletPrivateKey: string;
   proxyWalletAddress: string;
@@ -37,6 +46,7 @@ export interface AppConfig {
   copy: CopyConfig;
   filter: FilterConfig;
   exit: ExitConfig;
+  ui?: UiConfig;
 }
 
 export interface LeaderTrade {

@@ -3,6 +3,9 @@ clob_host = "https://clob.polymarket.com"
 
 chain_id = 137
 
+# Web UI port (env PORT overrides)
+port = 8000
+
 # When true, log trades but do not execute
 simulation = false
 
@@ -10,8 +13,8 @@ simulation = false
 # Single address: websocket. Multiple: polling positions API.
 target_address = [
     # "0x204f72f35326db932158cba6adff0b9a1da95e14",
-    "0xee613b3fc183ee44f9da9c05f53e2da107e3debf",
-    "0x2005d16a84ceefa912d4e380cd32e7ff827875ea"
+    "0x1979ae6B7E6534dE9c4539D0c205E582cA637C9D",
+    "0x204f72f35326db932158cba6adff0b9a1da95e14"
 ]
 revert_trade = false
 # Multiply copied trade size by this (1.0 = same size)
@@ -37,5 +40,11 @@ entry_trade_sec = 0
 
 # Skip if market resolves within N seconds (0 = no filter)
 trade_sec_from_resolve = 0
+
+[ui]
+# How long (seconds) to show positions with balance changes at top of Live positions (0 = use default 10)
+delta_highlight_sec = 10
+# Duration (seconds) for the +/- delta animation highlight (0 = use default 2)
+delta_animation_sec = 2
 
 

@@ -1,5 +1,6 @@
 import { DATA_API } from "../constant";
 import { AppConfig, LeaderTrade } from "../types";
+import { setPositions } from "../web/state";
 
 interface Position {
   asset: string;
@@ -117,6 +118,8 @@ export function runPositionPolling(
         }
 
         const pprev = prev[user];
+        const posList = Object.values(curr).map((c) => ({ ...c }));
+        setPositions(user, posList);
         if (!pprev) {
           prev[user] = curr;
           logPositionsAll(user, curr);
@@ -182,6 +185,30 @@ export function runPositionPolling(
   }
 
   console.log(`${fmtTime()} | polling ${targets.length} targets every ${config.copy.pollIntervalSec}s`);
+  poll();
+  setInterval(poll, intervalMs);
+}
+
+/** Fetches positions for UI only (no trade callbacks). Use for single-target websocket mode. */
+export function runPositionsUiPoll(config: AppConfig): void {
+  const targets = config.copy.targetAddresses.map((a) => a.toLowerCase());
+  const intervalMs = Math.max(10000, config.copy.pollIntervalSec * 1000);
+  async function poll() {
+    for (const user of targets) {
+      try {
+        const positions = await fetchPositions(user);
+        const curr = positions.map((p) => ({
+          slug: p.slug,
+          outcome: p.outcome,
+          size: p.size,
+          curPrice: p.curPrice,
+        }));
+        setPositions(user, curr);
+      } catch (e) {
+        /* ignore for UI */
+      }
+    }
+  }
   poll();
   setInterval(poll, intervalMs);
 }

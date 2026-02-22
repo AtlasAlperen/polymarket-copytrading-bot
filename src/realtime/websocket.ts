@@ -3,6 +3,7 @@ import type { AppConfig, ActivityTradePayload } from "../types";
 import { copyTrade, activityPayloadToLeaderTrade } from "../trading";
 import { shouldCopyTrade } from "../trading/filter";
 import { recordEntry } from "../trading/exit";
+import { pushTrade } from "../web/state";
 import type { ClobClient } from "@polymarket/clob-client";
 import { MAX_SEEN } from "../constant";
 
@@ -14,12 +15,19 @@ function fmtTime(): string {
 export function logTrade(
   tag: string,
   trade: { side: string; size: string; price: string; asset_id: string; slug?: string; outcome?: string },
-  extra?: string
+  opts?: string | { targetAddress?: string; copyStatus?: string }
 ): void {
   const slug = trade.slug ?? trade.asset_id.slice(0, 12) + "…";
   const outcome = trade.outcome ?? "?";
   const line = [fmtTime(), tag, trade.side, outcome, `size ${trade.size} @ ${trade.price}`, slug].join(" | ");
+  const extra =
+    typeof opts === "string"
+      ? opts
+      : opts
+        ? [opts.targetAddress ? `from ${opts.targetAddress}` : "", opts.copyStatus ?? ""].filter(Boolean).join(" ")
+        : "";
   console.log(extra ? `${line} | ${extra}` : line);
+  pushTrade(tag, trade, opts);
 }
 
 function pruneSeen(seen: Set<string>): void {
@@ -53,7 +61,7 @@ export function runActivityStream(client: ClobClient | null, config: AppConfig):
       pruneSeen(seen);
       if (!shouldCopyTrade(config, trade)) return;
       if (config.simulationMode) {
-        logTrade("SIM", trade, "skipped");
+        logTrade("SIM", trade, { copyStatus: "skipped" });
       } else if (client) {
         copyTrade(
           client,
@@ -64,10 +72,10 @@ export function runActivityStream(client: ClobClient | null, config: AppConfig):
         )
           .then((filled) => {
             if (filled && trade.side === "BUY") recordEntry(trade.asset_id, filled.size, filled.price);
-            logTrade("LIVE", trade, "ok");
+            logTrade("LIVE", trade, { targetAddress: config.copy.targetAddress, copyStatus: "ok" });
           })
           .catch((e) => {
-            logTrade("LIVE", trade, "FAILED");
+            logTrade("LIVE", trade, { targetAddress: config.copy.targetAddress, copyStatus: "FAILED" });
             console.error("  ", e?.message ?? e);
           });
       }
