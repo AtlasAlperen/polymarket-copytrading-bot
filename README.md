@@ -52,7 +52,7 @@ High level flow: **Data API (poll)** → **trade monitor** → **in-memory queue
 ## Install
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/AtlasAlperen/polymarket-copytrading-bot
 cd polymarket-arbitrage-trading-bot
 npm install
 ```
@@ -74,6 +74,7 @@ Create a `.env` in the project root. You need at least:
 USER_ADDRESS=0x...   # wallet you're copying
 PROXY_WALLET=0x...   # your wallet
 PRIVATE_KEY=...      # 64 hex chars, no 0x
+TARGET_ADDRESS=...   # wallet you are copying
 
 # Polymarket
 CLOB_HTTP_URL=https://clob.polymarket.com
